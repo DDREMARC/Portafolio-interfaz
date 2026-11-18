@@ -1,0 +1,106 @@
+/* =========================================================
+   fx-nav.css — estilos de fx-nav.js
+   1. GooeyNav (navbar) · 2. Crosshair
+   Todo lo de la barra cuelga de .nav-pill.gn (la clase la pone el JS):
+   sin JS queda el nav original de styles.css (subrayado naranja en el activo).
+   Las reglas ganan por especificidad a `.nav-pill a...` de styles.css sin !important.
+   ========================================================= */
+
+/* ---------- 1. GooeyNav ---------- */
+.nav-pill.gn {
+  --gn-pill: var(--accent);        /* color de la gota (el JS lo lee de aquí) */
+  --gn-active-ink: #0a0a0f;        /* texto sobre la gota naranja: contraste ~7:1 (blanco daría 2.8:1) */
+  --gn-x: 20px;
+  --gn-y: 9px;
+  --gn-gap: 2px;
+  --gn-font: 0.9rem;
+  display: flex;
+  position: relative;
+  gap: 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;               /* styles.css (<=480px) lo pone en auto: aquí el modo scroll vive en el stage */
+}
+.gn-stage { position: relative; min-width: 0; max-width: 100%; }
+.gn-track { position: relative; }
+.gn-canvas { position: absolute; top: 0; left: 0; pointer-events: none; }
+.gn-fallback {
+  position: absolute; top: 0; left: 0; display: none;
+  border-radius: 999px; background: var(--gn-pill); pointer-events: none;
+  transition: transform 0.5s var(--ease), width 0.5s var(--ease), height 0.5s var(--ease), opacity 0.2s ease;
+}
+.gn-list { position: relative; display: flex; gap: var(--gn-gap); margin: 0; padding: 0; list-style: none; }
+/* Copia decorativa del texto en color "activo": sólo se ve dentro del clip-path de la gota */
+.gn-list--active {
+  position: absolute; inset: 0;
+  color: var(--gn-active-ink);
+  visibility: hidden;
+  clip-path: inset(100%);
+  pointer-events: none;
+}
+.gn-item { display: flex; }
+
+.nav-pill.gn .gn-link {
+  display: inline-flex; align-items: center;
+  padding: var(--gn-y) var(--gn-x);
+  border-radius: 999px;
+  background: none; border: 0;
+  font-size: var(--gn-font); font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transform: none;
+  transition: color var(--t);
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-pill.gn a.gn-link:hover { background: none; transform: none; color: var(--text-primary); }
+/* Estado activo = el que marca initNav (app.js): .is-active y aria-current="location" */
+.nav-pill.gn a.gn-link.is-active,
+.nav-pill.gn a.gn-link[aria-current] { color: var(--text-primary); font-weight: 500; }  /* mismo peso: no cambia el ancho */
+.nav-pill.gn a.gn-link::after { content: none; }                                          /* sin el subrayado: lo da la gota */
+.nav-pill.gn .gn-list--active .gn-link { color: inherit; }
+.nav-pill.gn a.gn-link:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 999px; }
+
+/* Sin WebGL2: la píldora CSS se desliza y el texto "activo" sigue su clip-path */
+.nav-pill.gn.gn-nogl .gn-list--active { transition: clip-path 0.5s var(--ease); }
+
+/* Red de seguridad: si los items no caben en el hueco (fuente de reserva más ancha, un 6º item),
+   la barra se desplaza en horizontal (el JS centra el activo y marca los bordes con más contenido).
+   El stage gana 4px de relleno con margen negativo igual: el layout no cambia, pero la gota
+   (que rebota un poco más grande que su item) y su sombra no se recortan en seco arriba/abajo. */
+.nav-pill.gn.gn-scroll .gn-stage {
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+  padding: 4px; margin: -4px; max-width: calc(100% + 8px);
+}
+.nav-pill.gn.gn-scroll .gn-stage::-webkit-scrollbar { display: none; }
+.nav-pill.gn.gn-scroll .gn-track { width: max-content; }
+.nav-pill.gn.gn-scroll a.gn-link:focus-visible { outline-offset: -3px; }
+.nav-pill.gn.gn-more-r .gn-stage { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); }
+.nav-pill.gn.gn-more-l .gn-stage { -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px); mask-image: linear-gradient(90deg, transparent, #000 22px); }
+.nav-pill.gn.gn-more-l.gn-more-r .gn-stage { -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent); }
+
+/* Tallas FLUIDAS (clamp sobre el ancho de pantalla): los 5 enlaces de la landing (Inicio, Nosotros, Galería,
+   Testimonios, Contacto = 40 letras) caben SIN scroll de 320 a 760px. Con tallas fijas por tramo "Contacto" quedaba
+   cortado a 320px (modo scroll). Hasta 480px styles.css oculta la marca para dejar todo el ancho a la barra. */
+@media (max-width: 760px) {
+  .nav-pill.gn { --gn-x: clamp(8px, 2.2vw, 14px); --gn-y: 8px; --gn-font: clamp(0.8rem, 2.1vw, 0.9rem); }
+}
+@media (max-width: 480px) {
+  /* --gn-y: 12px = objetivo táctil de ~44px de alto */
+  .nav-pill.gn { --gn-x: clamp(3px, 1.4vw, 9px); --gn-y: 12px; --gn-font: clamp(0.675rem, 3.3vw, 0.8rem); --gn-gap: 1px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gn-fallback, .nav-pill.gn.gn-nogl .gn-list--active { transition: none; }
+}
+@media (forced-colors: active) {
+  .gn-canvas, .gn-fallback, .gn-list--active { display: none !important; }
+  .nav-pill.gn a.gn-link[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+}
+@media print { .gn-canvas, .gn-fallback { display: none; } }
+
+/* ---------- 2. Crosshair ----------
+   Lienzo fijo creado por fx-nav.js sólo con puntero fino y sin movimiento reducido.
+   z-index 50: por encima del contenido (1-2), por DEBAJO del navbar (100), de las chispas
+   del clic (450), los modales (500) y el preloader (1000). Nunca captura el puntero. */
+.fx-crosshair { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+@media (pointer: coarse), (hover: none), (prefers-reduced-motion: reduce), print { .fx-crosshair { display: none; } }

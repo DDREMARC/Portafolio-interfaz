@@ -1,0 +1,14 @@
+# Secretos y datos privados (no subir a GitHub)
+config.php
+mensajes/*
+mensajes/*.log
+mensajes/*.json
+!mensajes/.htaccess
+!mensajes/index.html
+
+# Copias de seguridad y temporales
+*.pre-*
+*.bak
+*.orig
+.DS_Store
+Thumbs.db

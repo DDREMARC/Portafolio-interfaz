@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <!-- viewport-fit=cover: el fondo llega bajo el notch; styles.css rellena con env(safe-area-inset-*) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DREMARC | Portafolio</title>
+  <meta name="description" content="Landing page de DREMARC (DDREMARC en GitHub): inicio, nosotros, galería, testimonios y contacto. Proyectos en Java, JavaScript, Python y HTML.">
+  <meta name="theme-color" content="#050507">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="./assets/fable/security-lock-static.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./fx-projects.css">
+  <link rel="stylesheet" href="./fx-music.css">
+  <link rel="stylesheet" href="./fx-text.css">
+  <link rel="stylesheet" href="./fx-nav.css">
+  <link rel="stylesheet" href="./landing.css">
+  <!-- Galería y testimonios: los datos y el render van ANTES de app.js para que initReveal/initSpotlight
+       encuentren ya las tarjetas (los scripts defer corren en orden de aparición). -->
+  <script src="./galeria-data.js" defer></script>
+  <script src="./testimonios.js" defer></script>
+  <script src="./landing.js" defer></script>
+  <script src="./app.js" defer></script>
+  <script src="./vendor/gsap.min.js" defer></script>
+  <script src="./fx-projects.js" defer></script>
+  <script src="./music-data.js" defer></script>
+  <script src="./fx-music.js" defer></script>
+  <script src="./fx-text.js" defer></script>
+  <script src="./fx-nav.js" defer></script>
+  <noscript><style>#preloader{display:none!important}</style></noscript>
+</head>
+<body>
+
+<!-- ============ SPRITE DE ICONOS (stroke = currentColor) ============ -->
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
+    <symbol id="i-linkedin" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></symbol>
+    <symbol id="i-youtube" viewBox="0 0 24 24"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+    <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .01-1 1v2c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ FONDO FIJO A PANTALLA COMPLETA ============
+     Dos lienzos position:fixed detrás de todo el contenido (sin capturar clics):
+     #aurora-canvas = Aurora WebGL2 puro (lo dibuja app.js; si no hay WebGL se elimina solo)
+     #particles-canvas = partículas 2D. Antes vivían dentro del hero y se cortaban al final de él. -->
+<canvas id="aurora-canvas" aria-hidden="true"></canvas>
+<canvas id="particles-canvas" aria-hidden="true"></canvas>
+
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<!-- ============ PRELOADER ============ -->
+<div id="preloader" role="status" aria-live="polite" aria-label="Cargando portafolio">
+  <div class="preloader-inner">
+    <ul class="preloader-icons" aria-hidden="true">
+      <li><img src="./assets/icons/github.svg" alt="" width="32" height="32"></li>
+      <li><img src="./assets/icons/java.svg" alt="" width="32" height="32"></li>
+      <li><img src="./assets/icons/javascript.svg" alt="" width="32" height="32"></li>
+    </ul>
+    <p class="preloader-text blur-text" id="preloader-text" data-blur-text>Welcome to my Portfolio Website</p>
+    <a class="preloader-url" href="https://github.com/DDREMARC" tabindex="-1">github.com/DDREMARC</a>
+    <div class="preloader-bar" aria-hidden="true"><span></span></div>
+  </div>
+</div>
+
+<!-- ============ NAVBAR ============ -->
+<header class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="#home" aria-label="Ir al inicio">
+      <img class="brand-mark" src="./assets/fable/security-lock-static.svg" alt="" width="28" height="32">
+      <span class="brand-handle">@DDREMARC</span>
+    </a>
+
+    <!-- Landing de 5 secciones: Inicio, Nosotros, Galería, Testimonios, Contacto.
+         Portfolio, seguridad y música siguen en la página (CTA del hero y pie); en la barra cuentan como "Nosotros"
+         (ver initNav en app.js). Para volver a mostrarlas basta añadir aquí <a href="#portfolio" data-nav="portfolio"> y
+         cambiar su entrada en el mapa de initNav. 7 enlaces ya no caben a 320px sin desplazar la barra. -->
+    <nav class="nav-pill" aria-label="Principal">
+      <a href="#home" class="is-active" data-nav="home">Inicio</a>
+      <a href="#about" data-nav="about">Nosotros</a>
+      <a href="#gallery" data-nav="gallery">Galería</a>
+      <a href="#testimonials" data-nav="testimonials">Testimonios</a>
+      <a href="#contact" data-nav="contact">Contacto</a>
+    </nav>
+
+    <div class="nav-social">
+      <a href="https://github.com/DDREMARC" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="hero-glow" aria-hidden="true"></div>
+
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="badge-available"><span class="dot" aria-hidden="true">•</span> AVAILABLE FOR WORK</span>
+
+        <h1 id="hero-title" class="hero-title">
+          <span class="grad-text">Hola, soy</span>
+          <span class="hero-name" id="hero-name">DREMARC</span>
+        </h1>
+
+        <!-- RotatingText (fx-text.js): sustituye el typewriter de abajo, que queda como respaldo sin JS -->
+        <p class="hero-sub" aria-live="off" data-rotating data-rotating-prefix="Estudiante en Tecsup:" data-rotating-texts='["Java, JavaScript y Python","POO y bases de datos","Desarrollo web"]' data-rotating-color="#f97316">
+          <span id="typewriter" data-typewriter data-phrases='["Estudiante de programación en Tecsup","Java, JavaScript y Python","POO, bases de datos y desarrollo web"]'>Estudiante de programación en Tecsup</span><span class="caret" aria-hidden="true"></span>
+        </p>
+
+        <p class="hero-bio" id="github-bio" data-bind="bio">20 repositorios públicos en GitHub: ejercicios de POO en Java, proyectos de bases de datos, una API del clima y sitios web.</p>
+
+        <ul class="lang-pills" aria-label="Lenguajes principales">
+          <li class="pill">JavaScript</li>
+          <li class="pill">Java</li>
+          <li class="pill">HTML</li>
+        </ul>
+
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#portfolio" data-goto-tab="projects">Explorar Proyectos <svg class="icon"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-glass" href="#contact">Contactar <svg class="icon"><use href="#i-mail"/></svg></a>
+        </div>
+
+        <a class="scroll-hint" href="#about">SCROLL <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>
+      </div>
+
+      <div class="hero-visual">
+        <!--
+          LANYARD: el JS toma #lanyard-container.
+          Marcado estático de respaldo (sin JS = balanceo CSS suave).
+          Cuando el motor de física arranque, añadir .is-physics a .lanyard-rig
+          para desactivar la animación de respaldo y mover #lanyard-card por transform.
+        -->
+        <div id="lanyard-container" class="lanyard" aria-label="Credencial interactiva colgante">
+          <div class="lanyard-anchor" aria-hidden="true"></div>
+          <div class="lanyard-rig" id="lanyard-rig">
+            <div class="lanyard-strap" id="lanyard-strap" aria-hidden="true"></div>
+            <div class="lanyard-clip" aria-hidden="true"></div>
+            <div class="lanyard-card" id="lanyard-card">
+              <div class="lanyard-slot" aria-hidden="true"></div>
+              <div class="lanyard-card-head"><span>DEV&nbsp;ID</span><span>GITHUB</span></div>
+              <img class="lanyard-avatar" id="lanyard-avatar" src="https://avatars.githubusercontent.com/u/282370465?v=4" alt="Avatar de GitHub de DDREMARC" width="160" height="160" loading="eager" referrerpolicy="no-referrer" draggable="false">
+              <h2 class="lanyard-name" id="lanyard-name">DREMARC</h2>
+              <p class="lanyard-role" id="lanyard-role">Estudiante de diseño y desarrollo de software</p>
+              <p class="lanyard-handle">@DDREMARC</p>
+              <div class="lanyard-barcode" id="lanyard-barcode" aria-hidden="true"></div>
+              <p class="lanyard-id">ID 282370465</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT + BENTO STATS ============ -->
+  <section class="section" id="about" aria-labelledby="about-title">
+    <div class="container">
+      <header class="section-head">
+        <span class="eyebrow">// 01 · NOSOTROS</span>
+        <h2 id="about-title" class="section-title">Sobre <span class="grad-text">mí</span></h2>
+      </header>
+
+      <div class="about-grid">
+        <figure class="about-photo glass">
+          <img src="./assets/images/portrait.jpg" alt="Retrato" width="700" height="1050" loading="lazy">
+          <figcaption class="mono-tag">@DDREMARC · GitHub</figcaption>
+        </figure>
+
+        <div class="about-copy">
+          <p class="lead">Soy DREMARC (<span class="mono-tag">DDREMARC</span> en GitHub). Estudio en Tecsup (ciclo 2026, C24S A - 1) y construyo proyectos de Programación Orientada a Objetos en Java, bases de datos y desarrollo web con JavaScript.</p>
+          <p>Aquí reúno lo que voy publicando: los proyectos finales de POO y Base de Datos, ejercicios en Java, una API del clima y varios sitios web.</p>
+
+          <blockquote class="quote">
+            Aprender construyendo: cada repositorio es un problema resuelto con código.
+          </blockquote>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#portfolio" data-goto-tab="projects">View Projects <svg class="icon"><use href="#i-arrow"/></svg></a>
+            <button class="btn btn-glass" type="button" id="download-cv" data-cv-pending="true" disabled title="CV próximamente">Download CV <svg class="icon"><use href="#i-download"/></svg></button>
+          </div>
+        </div>
+
+        <div class="bento" aria-label="Estadísticas">
+          <article class="stat glass stat-hot">
+            <svg class="icon stat-icon"><use href="#i-code"/></svg>
+            <p class="stat-num" data-count="20" id="stat-projects">20</p>
+            <p class="stat-label">TOTAL PROJECTS</p>
+            <p class="stat-note">Repositorios públicos en GitHub</p>
+          </article>
+          <article class="stat glass">
+            <svg class="icon stat-icon"><use href="#i-award"/></svg>
+            <p class="stat-num" data-count="0" id="stat-certs">0</p>
+            <p class="stat-label">CERTIFICATES</p>
+            <p class="stat-note">Aún sin certificados cargados</p>
+          </article>
+          <article class="stat glass stat-ring">
+            <svg class="icon stat-icon"><use href="#i-layers"/></svg>
+            <p class="stat-num" data-count="15" id="stat-tech">15</p>
+            <p class="stat-label">TECHNOLOGIES</p>
+            <p class="stat-note">En mi Tech Stack</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PORTFOLIO SHOWCASE ============ -->
+  <section class="section" id="portfolio" aria-labelledby="portfolio-title">
+    <div class="container">
+      <header class="section-head center">
+        <span class="eyebrow">// 02 · PORTFOLIO</span>
+        <h2 id="portfolio-title" class="section-title">Portfolio <span class="grad-text">Showcase</span></h2>
+        <p class="section-sub">Proyectos reales de GitHub, certificados y las tecnologías con las que trabajo.</p>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Secciones del portafolio" id="portfolio-tabs">
+        <button class="tab" role="tab" id="tab-projects" data-tab="projects" aria-selected="true" aria-controls="panel-projects" type="button"><svg class="icon"><use href="#i-code"/></svg>Projects</button>
+        <button class="tab" role="tab" id="tab-certificates" data-tab="certificates" aria-selected="false" aria-controls="panel-certificates" tabindex="-1" type="button"><svg class="icon"><use href="#i-award"/></svg>Certificates</button>
+        <button class="tab" role="tab" id="tab-techstack" data-tab="techstack" aria-selected="false" aria-controls="panel-techstack" tabindex="-1" type="button"><svg class="icon"><use href="#i-layers"/></svg>Tech Stack</button>
+      </div>
+
+      <!-- TAB 1: PROJECTS -->
+      <div class="tab-panel" role="tabpanel" id="panel-projects" aria-labelledby="tab-projects" data-panel="projects">
+        <!--
+          #projects-grid ya trae las tarjetas (12 con datos reales de GitHub + 1 con enlace pendiente, data-url="#").
+          Hooks: .project-card[data-repo|data-url|data-lang|data-stars|data-desc|data-image]
+                 [data-open-modal] abre #project-modal (alternar .is-open + aria-hidden).
+          La portada de cada tarjeta es CSS por lenguaje ([data-lang]); data-image es opcional
+          (sin él no hay foto stock repetida). Descripción vacía: .project-desc.is-empty[hidden].
+        -->
+        <div id="projects-grid" class="projects-grid">
+          <article class="project-card glass" data-repo="eva03" data-url="https://github.com/DDREMARC/eva03" data-lang="Java" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">Java</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">eva03</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/eva03" target="_blank" rel="noopener noreferrer" aria-label="Abrir eva03 en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="base-de-datos-final-semana16" data-url="https://github.com/DDREMARC/base-de-datos-final-semana16" data-lang="JavaScript" data-stars="0" data-desc="Proyecto final del curso de Base de Datos - Tecsup 2026 C24S A - 1">
+            <div class="project-media">
+              <span class="project-lang">JavaScript</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">base-de-datos-final-semana16</h3>
+              <p class="project-desc">Proyecto final del curso de Base de Datos - Tecsup 2026 C24S A - 1</p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/base-de-datos-final-semana16" target="_blank" rel="noopener noreferrer" aria-label="Abrir base-de-datos-final-semana16 en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="ayllu-java-poo" data-url="https://github.com/DDREMARC/ayllu-java-poo" data-lang="Java" data-stars="1" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">Java</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">ayllu-java-poo</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>1</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/ayllu-java-poo" target="_blank" rel="noopener noreferrer" aria-label="Abrir ayllu-java-poo en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="POO-FINAL" data-url="https://github.com/DDREMARC/POO-FINAL" data-lang="Java" data-stars="0" data-desc="Proyecto final del curso de POO - Tecsup 2026 C24S A - 1">
+            <div class="project-media">
+              <span class="project-lang">Java</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">POO-FINAL</h3>
+              <p class="project-desc">Proyecto final del curso de POO - Tecsup 2026 C24S A - 1</p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/POO-FINAL" target="_blank" rel="noopener noreferrer" aria-label="Abrir POO-FINAL en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="Zafiro-asistente" data-url="https://github.com/DDREMARC/Zafiro-asistente" data-lang="Python" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">Python</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">Zafiro-asistente</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/Zafiro-asistente" target="_blank" rel="noopener noreferrer" aria-label="Abrir Zafiro-asistente en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="spaGabrielGomez2027" data-url="https://github.com/DDREMARC/spaGabrielGomez2027" data-lang="HTML" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">HTML</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">spaGabrielGomez2027</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/spaGabrielGomez2027" target="_blank" rel="noopener noreferrer" aria-label="Abrir spaGabrielGomez2027 en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="spaGabrielGomez" data-url="https://github.com/DDREMARC/spaGabrielGomez" data-lang="HTML" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">HTML</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">spaGabrielGomez</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/spaGabrielGomez" target="_blank" rel="noopener noreferrer" aria-label="Abrir spaGabrielGomez en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="api-clima-gabrielgomez" data-url="https://github.com/DDREMARC/api-clima-gabrielgomez" data-lang="JavaScript" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">JavaScript</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">api-clima-gabrielgomez</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/api-clima-gabrielgomez" target="_blank" rel="noopener noreferrer" aria-label="Abrir api-clima-gabrielgomez en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="Chifa-del-tio-sam" data-url="https://github.com/DDREMARC/Chifa-del-tio-sam" data-lang="JavaScript" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">JavaScript</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">Chifa-del-tio-sam</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/Chifa-del-tio-sam" target="_blank" rel="noopener noreferrer" aria-label="Abrir Chifa-del-tio-sam en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="proyecto_01" data-url="https://github.com/DDREMARC/proyecto_01" data-lang="JavaScript" data-stars="1" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang">JavaScript</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">proyecto_01</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>1</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/proyecto_01" target="_blank" rel="noopener noreferrer" aria-label="Abrir proyecto_01 en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="ejercicios-poo-java" data-url="https://github.com/DDREMARC/ejercicios-poo-java" data-lang="HTML" data-stars="0" data-desc="Ejercicios de codigo por completar de POO en Java (semanas 1 a 6)">
+            <div class="project-media">
+              <span class="project-lang">HTML</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">ejercicios-poo-java</h3>
+              <p class="project-desc">Ejercicios de codigo por completar de POO en Java (semanas 1 a 6)</p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/ejercicios-poo-java" target="_blank" rel="noopener noreferrer" aria-label="Abrir ejercicios-poo-java en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="project-card glass" data-repo="SEM_05" data-url="https://github.com/DDREMARC/SEM_05" data-lang="" data-stars="0" data-desc="Repositorio de GitHub sin descripción.">
+            <div class="project-media">
+              <span class="project-lang is-empty">Sin lenguaje</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">SEM_05</h3>
+              <p class="project-desc is-empty" hidden></p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="https://github.com/DDREMARC/SEM_05" target="_blank" rel="noopener noreferrer" aria-label="Abrir SEM_05 en GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <!-- TODO: URL real de InfinityFree/GitHub -->
+          <!-- data-url="#" = enlace pendiente: app.js lo ignora (modal sin botón de GitHub, icono sin navegar). data-lang="HTML" elige la portada CSS; data-lang-label es el texto mostrado. -->
+          <article class="project-card glass" data-repo="Landing page responsive" data-url="#" data-lang="HTML" data-lang-label="HTML/CSS/JS" data-stars="0" data-desc="Landing page adaptada a todo tipo de dispositivos. 5 secciones: Home, About Us, Galería, Contacto... Alojada en InfinityFree. Formulario de contacto funcional. Todos los archivos también en GitHub.">
+            <div class="project-media">
+              <span class="project-lang">HTML/CSS/JS</span>
+            </div>
+            <div class="project-body">
+              <h3 class="project-name">Landing page responsive</h3>
+              <p class="project-desc">Landing page adaptada a todo tipo de dispositivos. 5 secciones: Home, About Us, Galería, Contacto... Alojada en InfinityFree. Formulario de contacto funcional. Todos los archivos también en GitHub.</p>
+              <div class="project-foot">
+                <span class="mono-tag project-stars"><svg class="icon"><use href="#i-star"/></svg>0</span>
+                <div class="project-actions">
+                  <a class="icon-link" href="#" aria-disabled="true" aria-label="Enlace del proyecto Landing page responsive: pendiente"><svg class="icon"><use href="#i-github"/></svg></a>
+                  <button class="btn btn-glass btn-sm" type="button" data-open-modal>Details <svg class="icon"><use href="#i-arrow"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- TAB 2: CERTIFICATES -->
+      <div class="tab-panel" role="tabpanel" id="panel-certificates" aria-labelledby="tab-certificates" data-panel="certificates" hidden>
+        <div id="certificates-grid" class="certs-grid">
+          <article class="cert-empty glass">
+            <svg class="icon cert-empty-icon"><use href="#i-award"/></svg>
+            <h3>Aún no hay certificados publicados</h3>
+            <p>Cuando los agregue aparecerán aquí; cada uno se abrirá en un visor ampliado.</p>
+          </article>
+        </div>
+      </div>
+
+      <!-- TAB 3: TECH STACK (pirámide invertida 7-5-3: 15 iconos únicos) -->
+      <div class="tab-panel" role="tabpanel" id="panel-techstack" aria-labelledby="tab-techstack" data-panel="techstack" hidden>
+        <div class="pyramid" id="tech-pyramid" aria-label="Tecnologías">
+          <ul class="pyramid-row" data-count="7" style="--row:0">
+            <li class="tech" style="--i:0"><img src="./assets/icons/css3.svg" alt="CSS3" title="CSS3" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">CSS3</span></li>
+            <li class="tech" style="--i:1"><img src="./assets/icons/docker.svg" alt="Docker" title="Docker" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Docker</span></li>
+            <li class="tech" style="--i:2"><img src="./assets/icons/git.svg" alt="Git" title="Git" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Git</span></li>
+            <li class="tech" style="--i:3"><img src="./assets/icons/github.svg" alt="GitHub" title="GitHub" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">GitHub</span></li>
+            <li class="tech" style="--i:4"><img src="./assets/icons/html5.svg" alt="HTML5" title="HTML5" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">HTML5</span></li>
+            <li class="tech" style="--i:5"><img src="./assets/icons/java.svg" alt="Java" title="Java" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Java</span></li>
+            <li class="tech" style="--i:6"><img src="./assets/icons/javascript.svg" alt="JavaScript" title="JavaScript" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">JavaScript</span></li>
+          </ul>
+          <ul class="pyramid-row" data-count="5" style="--row:1">
+            <li class="tech" style="--i:7"><img src="./assets/icons/linux.svg" alt="Linux" title="Linux" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Linux</span></li>
+            <li class="tech" style="--i:8"><img src="./assets/icons/mysql.svg" alt="MySQL" title="MySQL" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">MySQL</span></li>
+            <li class="tech" style="--i:9"><img src="./assets/icons/nodejs.svg" alt="Node.js" title="Node.js" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Node.js</span></li>
+            <li class="tech" style="--i:10"><img src="./assets/icons/oracle.svg" alt="Oracle" title="Oracle" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Oracle</span></li>
+            <li class="tech" style="--i:11"><img src="./assets/icons/php.svg" alt="PHP" title="PHP" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">PHP</span></li>
+          </ul>
+          <ul class="pyramid-row" data-count="3" style="--row:2">
+            <li class="tech" style="--i:12"><img src="./assets/icons/python.svg" alt="Python" title="Python" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">Python</span></li>
+            <li class="tech" style="--i:13"><img src="./assets/icons/react.svg" alt="React" title="React" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">React</span></li>
+            <li class="tech" style="--i:14"><img src="./assets/icons/vscode.svg" alt="VS Code" title="VS Code" width="40" height="40" loading="lazy"><span class="tech-name" aria-hidden="true">VS Code</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERFORMANCE & SECURITY ============ -->
+  <section class="section section-security" id="security" aria-labelledby="security-title">
+    <div class="container">
+      <div class="security-panel glass">
+        <div class="security-copy">
+          <span class="eyebrow eyebrow-dark">// 03 · PERFORMANCE &amp; SECURITY</span>
+          <h2 id="security-title" class="section-title on-orange">Rendimiento y <span class="underline-dark">seguridad</span></h2>
+          <p class="security-lead">Sin rastreadores: solo se guarda lo que tú decides enviar.</p>
+          <ul class="security-list">
+            <li><svg class="icon"><use href="#i-shield"/></svg><span>Código vanilla: HTML, CSS y JavaScript sin frameworks.</span></li>
+            <li><svg class="icon"><use href="#i-shield"/></svg><span>Los comentarios se guardan solo en tu navegador (localStorage).</span></li>
+            <li><svg class="icon"><use href="#i-shield"/></svg><span>El formulario de contacto se valida en el servidor (PHP), con campo trampa y límite por IP.</span></li>
+            <li><svg class="icon"><use href="#i-shield"/></svg><span>Enlaces externos con <span class="mono-dark">rel="noopener noreferrer"</span>.</span></li>
+          </ul>
+        </div>
+
+        <div class="security-visual">
+          <div id="decrypted-matrix" class="matrix" role="img" aria-label="Anillo de texto cifrado alrededor de un candado de seguridad">
+            <svg class="matrix-ring" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+              <defs>
+                <path id="matrix-path" d="M200,200 m-172,0 a172,172 0 1,1 344,0 a172,172 0 1,1 -344,0"/>
+              </defs>
+              <text class="matrix-text">
+                <textPath id="decrypted-ring-text" href="#matrix-path" startOffset="0" textLength="1070" lengthAdjust="spacing" data-decrypt-text="SECURE DATA // END-TO-END ENCRYPTION // ZERO TRUST // 0x4F7E1A // AES-256 // ">SECURE DATA // END-TO-END ENCRYPTION // ZERO TRUST // 0x4F7E1A // AES-256 // </textPath>
+              </text>
+            </svg>
+            <div class="matrix-core">
+              <div id="fable-security-emblem" class="emblem">
+                <img src="./assets/fable/security-lock.svg" data-static-src="./assets/fable/security-lock-static.svg" alt="Candado de seguridad animado" width="120" height="140">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MÚSICA: LO QUE MÁS ESCUCHO ============
+       Las 5 tarjetas (TiltedCard) las pinta fx-music.js a partir de window.TOP_SONGS (music-data.js):
+       [{ title, artist, cover, url }]. Portada local ./assets/music/cover-N.jpg o remota (i.ytimg.com);
+       si falla, degradado de respaldo. Sin JS sólo se ve el aviso <noscript>. -->
+  <section class="section" id="music" aria-labelledby="music-title">
+    <div class="container">
+      <header class="section-head">
+        <span class="eyebrow">// 04 · MUSIC</span>
+        <h2 id="music-title" class="section-title">Lo que más <span class="grad-text">escucho</span></h2>
+        <p class="section-sub">Mi top 5 en YouTube Music. Pasa el cursor sobre una portada y haz clic para escucharla.</p>
+      </header>
+
+      <ul id="music-list" class="fx-songs" aria-label="Mis canciones más escuchadas"></ul>
+      <noscript><p class="mono-tag">Activa JavaScript para ver la lista de canciones.</p></noscript>
+    </div>
+  </section>
+
+  <!-- ============ GALERÍA ============
+       Las teselas las pinta landing.js a partir de window.GALERIA (galeria-data.js): [{ src, alt, caption, sample }].
+       Una entrada sin src es una tesela "Foto pendiente". Clic = visor ampliado (#gallery-lightbox).
+       Sin JS sólo se ve el aviso <noscript>. -->
+  <section class="section" id="gallery" aria-labelledby="gallery-title">
+    <div class="container">
+      <header class="section-head">
+        <span class="eyebrow">// 05 · GALERÍA</span>
+        <h2 id="gallery-title" class="section-title">Mi <span class="grad-text">galería</span></h2>
+        <p class="section-sub">Imágenes de mi entorno de trabajo y de mis proyectos. Toca una para verla en grande.</p>
+      </header>
+
+      <ul id="gallery-grid" class="gallery-grid" aria-label="Galería de imágenes"></ul>
+      <noscript><p class="mono-tag">Activa JavaScript para ver la galería.</p></noscript>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIOS ============
+       Las tarjetas las pinta landing.js a partir de window.TESTIMONIOS (testimonios.js):
+       [{ nombre, rol: 'Compañero' | 'Docente', ciclo, texto }]. Lo que falte hasta el mínimo se muestra como
+       "Pendiente: testimonio real". NO se inventan citas: sólo van opiniones reales y autorizadas. -->
+  <section class="section" id="testimonials" aria-labelledby="testimonials-title">
+    <div class="container">
+      <header class="section-head">
+        <span class="eyebrow">// 06 · TESTIMONIOS</span>
+        <h2 id="testimonials-title" class="section-title">Lo que <span class="grad-text">dicen</span> de mí</h2>
+        <p class="section-sub">Opiniones de compañeros y docentes de Tecsup.</p>
+      </header>
+
+      <ul id="testimonials-list" class="testi-grid" aria-label="Testimonios"></ul>
+      <noscript><p class="mono-tag">Activa JavaScript para ver los testimonios.</p></noscript>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT + COMMENTS ============ -->
+  <section class="section" id="contact" aria-labelledby="contact-title">
+    <div class="container">
+      <header class="section-head">
+        <span class="eyebrow">// 07 · CONTACTO</span>
+        <h2 id="contact-title" class="section-title">Hablemos <span class="grad-text">pronto</span></h2>
+      </header>
+
+      <div class="contact-grid">
+        <div class="contact-left">
+          <!-- Envía por fetch a contacto.php (POST, JSON). Sin JS el formulario también funciona: el navegador hace
+               el POST normal y contacto.php responde JSON. Límites (maxlength) iguales a los de contacto.php. -->
+          <form class="contact-form glass" id="contact-form" action="contacto.php" method="post" data-form="contact">
+            <h3 class="card-title">Envíame un mensaje</h3>
+            <label class="field">
+              <span>Nombre</span>
+              <input type="text" name="name" autocomplete="name" placeholder="Tu nombre" required minlength="2" maxlength="80" enterkeyhint="next">
+            </label>
+            <label class="field">
+              <span>Correo</span>
+              <input type="email" name="email" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="tu@correo.com" required maxlength="120" enterkeyhint="next">
+            </label>
+            <label class="field">
+              <span>Mensaje</span>
+              <textarea name="message" rows="5" placeholder="Cuéntame sobre tu proyecto" required minlength="10" maxlength="2000"></textarea>
+            </label>
+            <!-- Trampa anti-bots: las personas no la ven ni la llenan; contacto.php descarta los envíos que la traen rellena -->
+            <div class="hp-field" aria-hidden="true">
+              <label>No rellenar este campo <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+            </div>
+            <button class="btn btn-glass" type="submit"><span class="btn-label">Enviar mensaje</span> <svg class="icon"><use href="#i-send"/></svg></button>
+            <p class="form-status" id="contact-status" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="social-bento" aria-label="Redes sociales">
+            <a class="social-card glass" href="https://github.com/DDREMARC" target="_blank" rel="noopener noreferrer" data-social="github">
+              <svg class="icon"><use href="#i-github"/></svg><span class="social-name">GitHub</span><span class="social-handle">@DDREMARC</span>
+            </a>
+            <a class="social-card glass" href="https://www.linkedin.com/in/angel-gabriel-612484375" target="_blank" rel="noopener noreferrer" data-social="linkedin" data-pending="true" title="Enlace pendiente">
+              <svg class="icon"><use href="#i-linkedin"/></svg><span class="social-name">LinkedIn</span><span class="social-handle">@angel-gabriel</span>
+            </a>
+            <a class="social-card glass" data-social="instagram" data-pending="true" aria-disabled="true" title="Enlace pendiente">
+              <svg class="icon"><use href="#i-instagram"/></svg><span class="social-name">Instagram</span><span class="social-handle">Próximamente</span>
+            </a>
+            <a class="social-card glass" href="https://www.youtube.com/@dremarc_01" target="_blank" rel="noopener noreferrer" data-social="youtube" data-pending="true" title="Enlace pendiente">
+              <svg class="icon"><use href="#i-youtube"/></svg><span class="social-name">YouTube</span><span class="social-handle">@dremarc_01</span>
+            </a>
+          </div>
+        </div>
+
+        <!--
+          #comments-wall: el JS persiste en localStorage.
+          Hooks: #comment-form (name="author", name="text", #comment-image), #comment-image-preview,
+                 #comments-list, plantilla #comment-template, [data-like] con .like-count.
+        -->
+        <aside id="comments-wall" class="comments glass" aria-labelledby="comments-title">
+          <div class="comments-head">
+            <h3 id="comments-title" class="card-title">Muro de comentarios</h3>
+            <span class="mono-tag" id="comments-count">1 comentario</span>
+          </div>
+
+          <form id="comment-form" class="comment-form" autocomplete="off">
+            <label class="field">
+              <span>Nombre</span>
+              <input type="text" name="author" id="comment-author" maxlength="40" placeholder="Tu nombre" required>
+            </label>
+            <label class="field">
+              <span>Comentario</span>
+              <textarea name="text" id="comment-text" rows="3" maxlength="400" placeholder="Escribe un comentario" required></textarea>
+            </label>
+            <div class="comment-actions">
+              <label class="btn btn-glass btn-sm file-btn" for="comment-image">
+                <svg class="icon"><use href="#i-image"/></svg>Imagen (opcional)
+              </label>
+              <input class="visually-hidden" type="file" id="comment-image" name="image" accept="image/*">
+              <button class="btn btn-primary btn-sm" type="submit">Publicar <svg class="icon"><use href="#i-send"/></svg></button>
+            </div>
+            <div class="image-preview-wrap">
+              <img id="comment-image-preview" alt="Vista previa de la imagen adjunta" hidden>
+            </div>
+          </form>
+
+          <ul id="comments-list" class="comments-list">
+            <li class="comment is-pinned" data-comment-id="pinned">
+              <span class="pin-badge"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg>PINNED</span>
+              <div class="comment-top">
+                <span class="avatar" aria-hidden="true">D</span>
+                <div>
+                  <strong class="comment-author">DREMARC</strong>
+                  <span class="comment-time mono-tag">Autor del sitio</span>
+                </div>
+              </div>
+              <p class="comment-text">Gracias por visitar mi portafolio. Deja tu comentario o reacciona a los que ya están.</p>
+              <button class="like-btn" type="button" data-like aria-pressed="false"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg>Like <span class="like-count">0</span></button>
+            </li>
+          </ul>
+
+          <template id="comment-template">
+            <li class="comment" data-comment-id="">
+              <div class="comment-top">
+                <span class="avatar" aria-hidden="true"></span>
+                <div>
+                  <strong class="comment-author"></strong>
+                  <span class="comment-time mono-tag"></span>
+                </div>
+              </div>
+              <p class="comment-text"></p>
+              <img class="comment-image" alt="Imagen adjunta al comentario" hidden>
+              <button class="like-btn" type="button" data-like aria-pressed="false"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg>Like <span class="like-count">0</span></button>
+            </li>
+          </template>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://github.com/DDREMARC?tab=repositories" target="_blank" rel="noopener noreferrer">Repositorios</a></li>
+          <li><a href="https://github.com/DDREMARC?tab=followers" target="_blank" rel="noopener noreferrer">Seguidores</a></li>
+          <li><a href="https://github.com/DDREMARC?tab=stars" target="_blank" rel="noopener noreferrer">Favoritos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Social Media</h3>
+        <ul>
+          <li><a href="https://github.com/DDREMARC" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/angel-gabriel-612484375" target="_blank" rel="noopener noreferrer" data-social="linkedin" data-pending="true" title="Enlace pendiente">LinkedIn</a></li>
+          <li><a data-social="instagram" data-pending="true" aria-disabled="true" title="Enlace pendiente">Instagram</a></li>
+          <li><a href="https://www.youtube.com/@dremarc_01" target="_blank" rel="noopener noreferrer" data-social="youtube" data-pending="true" title="Enlace pendiente">YouTube</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>About</h3>
+        <ul>
+          <li><a href="#about">Sobre mí</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#music">Música</a></li>
+          <li><a href="#gallery">Galería</a></li>
+          <li><a href="#testimonials">Testimonios</a></li>
+          <li><a href="#contact">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 DREMARC (DDREMARC). Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<!-- ============ MODAL DE PROYECTO ============ -->
+<div id="project-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card glass">
+    <button class="modal-close" type="button" data-modal-close aria-label="Cerrar"><svg class="icon"><use href="#i-close"/></svg></button>
+    <div class="modal-media"><img id="modal-image" alt="" width="1200" height="800" loading="lazy"></div>
+    <div class="modal-body">
+      <div class="modal-meta">
+        <span class="pill" id="modal-lang">-</span>
+        <span class="mono-tag" id="modal-stars">★ 0</span>
+      </div>
+      <h3 id="modal-title" class="modal-title">Proyecto</h3>
+      <p id="modal-description" class="modal-desc">-</p>
+      <div class="cta-row">
+        <a id="modal-link" class="btn btn-primary" href="https://github.com/DDREMARC" target="_blank" rel="noopener noreferrer">Ver en GitHub <svg class="icon"><use href="#i-external"/></svg></a>
+        <a id="modal-homepage" class="btn btn-glass" href="#" target="_blank" rel="noopener noreferrer" hidden>Sitio web <svg class="icon"><use href="#i-external"/></svg></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LIGHTBOX DE CERTIFICADOS ============ -->
+<div id="cert-lightbox" class="modal lightbox" role="dialog" aria-modal="true" aria-label="Visor de certificado" aria-hidden="true">
+  <div class="modal-backdrop" data-modal-close></div>
+  <figure class="lightbox-figure">
+    <button class="modal-close" type="button" data-modal-close aria-label="Cerrar"><svg class="icon"><use href="#i-close"/></svg></button>
+    <img id="lightbox-image" src="" alt="" hidden>
+    <figcaption id="lightbox-caption" class="mono-tag"></figcaption>
+  </figure>
+</div>
+
+<!-- ============ VISOR DE LA GALERÍA ============
+     Lo controla landing.js (no app.js): Esc cierra, flechas navegan, deslizar en táctil, foco atrapado.
+     Reutiliza las clases .modal / .lightbox para verse igual que el visor de certificados. -->
+<div id="gallery-lightbox" class="modal lightbox" role="dialog" aria-modal="true" aria-label="Visor de la galería" aria-hidden="true">
+  <div class="modal-backdrop" data-lb-close></div>
+  <figure class="lightbox-figure lb-figure">
+    <button class="modal-close" type="button" data-lb-close aria-label="Cerrar"><svg class="icon"><use href="#i-close"/></svg></button>
+    <img id="gallery-lightbox-img" src="" alt="" hidden>
+    <p id="gallery-lightbox-error" class="lb-error mono-tag" hidden>No se pudo cargar la imagen.</p>
+    <figcaption class="lb-bar">
+      <button class="lb-btn lb-prev" type="button" data-lb-prev aria-label="Imagen anterior"><svg class="icon"><use href="#i-chevron"/></svg></button>
+      <span class="lb-text">
+        <span id="gallery-lightbox-caption" class="lb-caption"></span>
+        <span id="gallery-lightbox-count" class="lb-count mono-tag" aria-live="polite"></span>
+      </span>
+      <button class="lb-btn lb-next" type="button" data-lb-next aria-label="Imagen siguiente"><svg class="icon"><use href="#i-chevron"/></svg></button>
+    </figcaption>
+  </figure>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+/* =========================================================
+   fx-music.css - sección #music "Lo que más escucho" + TiltedCard
+   Cinco portadas cuadradas con inclinación 3D (fx-music.js escribe
+   transform y las variables --tc-*). Hover de la tarjeta: --lift 0.4s,
+   igual que el resto del sitio; la inclinación vive en .fx-tc__body, así
+   que no choca con la elevación del enlace.
+   ========================================================= */
+
+.fx-songs {
+  --g: clamp(14px, 2.4vw, 28px);
+  display: flex; flex-wrap: wrap; justify-content: center; gap: var(--g);
+  margin: 0; padding: 0; list-style: none;
+}
+.fx-song { flex: 0 0 calc((100% - 4 * var(--g)) / 5); min-width: 0; }
+@media (max-width: 1040px) { .fx-song { flex-basis: calc((100% - 2 * var(--g)) / 3); } }
+@media (max-width: 560px) { .fx-song { flex-basis: calc((100% - var(--g)) / 2); } }
+
+.fx-song-link {
+  display: flex; flex-direction: column; gap: 14px; min-width: 0;
+  color: inherit; text-decoration: none;
+  transition: transform var(--t);
+}
+a.fx-song-link:hover { transform: translateY(var(--lift)); }
+
+.fx-song-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-inline: 2px; }
+.fx-song-title {
+  font-family: var(--font-head); font-weight: 600; font-size: 0.98rem; line-height: 1.25; letter-spacing: -0.01em;
+  color: var(--text-primary); overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.fx-song-artist {
+  font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.02em; color: var(--text-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+a.fx-song-link:hover .fx-song-title { color: var(--text-accent); }
+.fx-song-title { transition: color var(--t); }
+
+/* ---------- TiltedCard ---------- */
+.fx-tc {
+  --tc-radius: 18px;
+  --fx-a: rgba(120, 120, 140, 0.5); --fx-b: #101018;
+  position: relative; width: 100%; aspect-ratio: 1;
+  perspective: 800px;
+  touch-action: pan-y pinch-zoom;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.fx-tc__shadow {
+  position: absolute; inset: 0; margin: auto; width: 100%; height: 100%;
+  border-radius: var(--tc-radius);
+  background: rgba(0, 0, 0, 0.6);
+  filter: blur(20px);
+  opacity: 0; pointer-events: none; will-change: transform, opacity;
+}
+.fx-tc__body {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.fx-tc__face {
+  position: absolute; inset: 0; overflow: hidden; isolation: isolate;
+  border-radius: var(--tc-radius);
+  background:
+    radial-gradient(110% 95% at 85% 0%, var(--fx-a), transparent 64%),
+    linear-gradient(160deg, var(--fx-b), var(--bg-elevated));
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+.fx-tc__note {
+  position: absolute; left: 50%; top: 50%; width: 34%; height: 34%; translate: -50% -50%;
+  fill: none; stroke: rgba(255, 255, 255, 0.28); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.fx-tc__face.has-cover .fx-tc__note { display: none; }
+.fx-tc__img {
+  position: absolute; display: block; max-width: none; object-fit: cover; pointer-events: none;
+  top: -6px; left: -6px; width: calc(100% + 12px); height: calc(100% + 12px);
+  transform: translate3d(calc(var(--tc-px, 0) * -24 * 1px), calc(var(--tc-py, 0) * -24 * 1px), 0);
+  -webkit-user-drag: none;
+}
+/* Miniaturas 4:3 de YouTube con franjas negras: se amplía para recortarlas */
+.fx-tc__img[data-letterbox] { scale: 1.34; }
+
+.fx-tc__glare {
+  position: absolute; inset: 0; z-index: 5;
+  background: radial-gradient(
+    farthest-corner circle at var(--tc-gx, 50%) var(--tc-gy, 50%),
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.34)) 0%,
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.285)) 18%,
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.108)) 36%,
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.003)) 54%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  mix-blend-mode: screen; pointer-events: none;
+}
+.fx-tc__rim {
+  position: absolute; inset: 0; z-index: 6; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--glass-border), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.fx-tc__edge {
+  position: absolute; inset: 0; z-index: 7; box-sizing: border-box; padding: 1px; border-radius: inherit;
+  background: radial-gradient(
+    farthest-side circle at var(--tc-gx, 50%) var(--tc-gy, 50%),
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.85)) 0%,
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.43)) 36%,
+    rgba(255, 255, 255, calc(var(--tc-glare, 0) * 0.02)) 72%,
+    rgba(255, 255, 255, 0) 85%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+.fx-tc__rank {
+  position: absolute; left: 10px; bottom: 10px; z-index: 4;
+  padding: 3px 10px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+  background: rgba(5, 5, 7, 0.78); color: var(--text-accent); border: 1px solid var(--glass-border);
+}
+
+/* Caption flotante (título + artista): sigue al cursor; decorativo para lectores de pantalla,
+   el enlace ya expone el mismo texto debajo de la portada */
+.fx-tc__caption {
+  position: absolute; top: 0; left: 0; z-index: 3;
+  display: flex; flex-direction: column; gap: 1px;
+  width: max-content; max-width: min(230px, calc(100% - 8px));
+  padding: 7px 11px; border-radius: 10px;
+  background: rgba(10, 10, 15, 0.9);
+  border: 1px solid var(--glass-edge);
+  box-shadow: 0 8px 22px -8px rgba(0, 0, 0, 0.6);
+  color: var(--text-primary); font-size: 0.78rem; line-height: 1.3;
+  opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;
+}
+.fx-tc__caption b {
+  font-weight: 600; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.fx-tc__caption span { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Foco de teclado: aro visible sobre la portada además del contorno global */
+.fx-song-link:focus-visible { outline-offset: 6px; border-radius: 12px; }
+.fx-song-link:focus-visible .fx-tc__rim { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7), inset 0 0 0 3px rgba(0, 0, 0, 0.35); }
+
+/* Táctil: tarjeta plana (el JS ni siquiera engancha el tilt) */
+@media (hover: none) and (pointer: coarse) {
+  .fx-tc__caption, .fx-tc__shadow { display: none; }
+  a.fx-song-link:hover { transform: none; }
+}
+/* Movimiento reducido: sin inclinación ni escala; el caption sólo se muestra/oculta */
+@media (prefers-reduced-motion: reduce) {
+  .fx-tc { perspective: none; }
+  .fx-tc__body { transform: none !important; }
+  .fx-tc__img { transform: none; }
+  .fx-tc__glare, .fx-tc__edge { display: none; }
+}

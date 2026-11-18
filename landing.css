@@ -1,0 +1,168 @@
+/* =========================================================
+   landing.css - GALERÍA, TESTIMONIOS, estado del formulario y ajustes móviles
+   Mismas fuentes y tokens que styles.css (vidrio, --lift, --hover-shadow, --t).
+   Naranja sólo como luz: icono de cita, enlace "Leer más" y el visor; nada de rellenos naranjas.
+   Los :hover de lo nuevo van dentro de (hover: hover) and (pointer: fine): en táctil no se queda pegado.
+   ========================================================= */
+
+/* ---------- 1. Galería ---------- */
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;
+}
+.gallery-item { display: grid; min-width: 0; }
+.gallery-tile {
+  display: block; position: relative; width: 100%; min-width: 0; padding: 0;
+  aspect-ratio: 4 / 3; text-align: left; color: var(--text-primary);
+  cursor: zoom-in; touch-action: manipulation;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+.gallery-tile img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  filter: saturate(0.9) contrast(1.05);
+  -webkit-user-drag: none;
+}
+.gallery-tile:focus-visible { border-radius: var(--radius); }   /* :focus-visible global pone 6px */
+.gallery-tile[data-index]:active { transform: scale(0.985); }
+
+/* Pie de la imagen: degradado oscuro para que el texto se lea sobre cualquier foto (>= 4.5:1) */
+.gallery-cap {
+  position: absolute; z-index: 2; left: 0; right: 0; bottom: 0;
+  padding: 30px 12px 10px;
+  background: linear-gradient(180deg, transparent, rgba(5, 5, 7, 0.88));
+}
+.gallery-cap-text {
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere;
+  font-family: var(--font-head); font-weight: 600; font-size: 0.9rem; line-height: 1.25; letter-spacing: -0.01em;
+}
+.gallery-badge {
+  position: absolute; z-index: 2; top: 10px; left: 10px;
+  padding: 3px 10px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+  background: rgba(5, 5, 7, 0.78); color: var(--text-secondary); border: 1px solid var(--glass-border);
+}
+
+/* Teselas sin foto (pendiente / rota): visibles a propósito, con borde punteado */
+.gallery-tile--pending {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px; text-align: center; cursor: default;
+  border-style: dashed; border-color: var(--glass-edge); background: var(--glass-clear);
+}
+.gallery-pending-icon { width: 30px; height: 30px; color: var(--text-tertiary); }
+.gallery-pending-title { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.08em; color: var(--text-secondary); }
+.gallery-pending-cap { max-width: 100%; overflow-wrap: anywhere; font-size: 0.82rem; line-height: 1.3; color: var(--text-tertiary); }
+.gallery-tile--pending:disabled { opacity: 1; }
+
+/* Lista vacía (galería y testimonios) */
+.gallery-empty, .testi-empty {
+  grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: clamp(32px, 6vw, 64px) 24px; text-align: center; border-style: dashed; border-color: var(--glass-edge);
+}
+.gallery-empty h3, .testi-empty h3 { font-size: 1.3rem; }
+.gallery-empty p, .testi-empty p { max-width: 46ch; }
+
+@media (min-width: 600px) {
+  .gallery-grid { gap: 20px; }
+  .gallery-cap-text { font-size: 0.98rem; }
+}
+@media (min-width: 900px) {
+  .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  /* n múltiplo de 3: la primera imagen ocupa 2x2 y la rejilla queda sin huecos */
+  .gallery-grid.has-feature .gallery-item:first-child { grid-column: span 2; grid-row: span 2; }
+  .gallery-grid.has-feature .gallery-item:first-child .gallery-tile { aspect-ratio: auto; height: 100%; }
+}
+@media (hover: hover) and (pointer: fine) {
+  /* Mismo hover que el resto del sistema: --lift + --hover-shadow */
+  .gallery-tile[data-index]:hover { transform: translateY(var(--lift)); box-shadow: var(--hover-shadow); border-color: var(--glass-edge); }
+}
+
+/* ---------- 2. Visor de la galería ---------- */
+.lb-figure { width: min(92vw, 1100px); touch-action: pan-y; }
+.lb-figure img { width: auto; height: auto; object-fit: contain; -webkit-user-drag: none; }
+.lb-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
+.lb-text { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.lb-caption {
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere; color: var(--text-primary); font-size: 0.95rem; line-height: 1.35;
+}
+.lb-error { padding: 48px 16px; text-align: center; color: var(--text-secondary); }
+.lb-btn {
+  flex: none; width: 46px; height: 46px; border-radius: 50%; padding: 0;
+  display: grid; place-items: center;
+  background: rgba(5, 5, 7, 0.55); border: 1px solid var(--glass-border); color: var(--text-primary);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  touch-action: manipulation; -webkit-user-select: none; user-select: none;
+  transition: background-color var(--t), border-color var(--t), color var(--t);
+}
+.lb-btn:active { background: var(--glass-thick); }
+.lb-btn:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; border-radius: 50%; }
+.lb-prev .icon { transform: rotate(180deg); }
+@media (hover: hover) and (pointer: fine) {
+  .lb-btn:hover { background: var(--glass-thick); border-color: var(--glass-edge); }
+}
+
+/* ---------- 3. Testimonios ---------- */
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 24px; }
+.testi-card { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 24px; }
+.testi-quote { width: 28px; height: 28px; color: var(--accent); }
+.testi-text { flex: 1; font-size: 1rem; line-height: 1.7; color: #D4D4D8; }
+.testi-text p { overflow-wrap: anywhere; }
+.testi-text p + p { margin-top: 8px; }
+.testi-text .is-clamped { display: -webkit-box; -webkit-line-clamp: 6; line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.testi-more {
+  align-self: flex-start; margin: -8px 0; padding: 10px 0; min-height: 44px;
+  background: none; border: 0; color: var(--text-accent);
+  font-family: var(--font-mono); font-size: 0.8rem; text-decoration: underline; text-underline-offset: 4px;
+  touch-action: manipulation; -webkit-user-select: none; user-select: none;
+}
+.testi-more:focus-visible { border-radius: 6px; }
+.testi-meta { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--glass-border); }
+.testi-meta .avatar { overflow: hidden; }
+.testi-meta .avatar .icon { width: 18px; height: 18px; }
+.testi-who { min-width: 0; display: flex; flex-direction: column; }
+.testi-name {
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere; color: var(--text-primary); font-size: 0.98rem; line-height: 1.3;
+}
+.testi-sub { overflow-wrap: anywhere; line-height: 1.4; }
+
+/* Pendiente: se ve a propósito que falta el testimonio real */
+.testi-card.is-pending { border-style: dashed; border-color: var(--glass-edge); background: var(--glass-clear); }
+.testi-card.is-pending .testi-quote { color: var(--text-tertiary); }
+.testi-pending-title { font-family: var(--font-head); font-weight: 600; font-size: 1.1rem; letter-spacing: -0.02em; color: var(--text-primary); }
+.testi-pending-hint { font-size: 0.9rem; color: var(--text-secondary); }
+@media (hover: hover) and (pointer: fine) {
+  .testi-card:hover { transform: translateY(var(--lift)); box-shadow: var(--hover-shadow); border-color: var(--glass-edge); }
+}
+
+/* ---------- 4. Formulario de contacto: campo trampa y estados ---------- */
+/* Fuera de pantalla (no display:none: algunos bots lo detectan); sin foco ni lectura de pantalla */
+.hp-field { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: #FCA5A5; }
+.contact-form[aria-busy="true"] .btn { cursor: progress; }
+.contact-form .btn { touch-action: manipulation; }
+.form-status { overflow-wrap: anywhere; }
+
+/* ---------- 5. Móvil / táctil (mobile-native) ---------- */
+/* Controles: sin selección de texto al mantener pulsado ni menú contextual. El texto de contenido sigue seleccionable. */
+.btn, .tab, .icon-link, .like-btn, .nav-pill a, .social-card, .modal-close {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+a, button, label.btn, [role="button"], [role="tab"] { touch-action: manipulation; }
+
+/* Los :hover de styles.css no están acotados a (hover: hover): en táctil el primer toque los deja "pegados".
+   Aquí se anula sólo el desplazamiento; el :active de cada control sigue dando respuesta al toque. */
+@media (hover: none) {
+  .btn:hover, .stat:hover, .project-card:hover, .tab:hover, .nav-pill a:hover, .nav-social a:hover,
+  .icon-link:hover, .like-btn:hover, .cert-card:hover, .social-card:hover, .scroll-hint:hover, .tech:hover { transform: none; }
+  .btn:active { transform: translateY(0) scale(0.98); }
+}
+
+/* ---------- 6. Pantallas muy estrechas (320px) ---------- */
+@media (max-width: 360px) {
+  .testi-card { padding: 20px; }
+  .gallery-grid { gap: 10px; }
+  .gallery-cap { padding: 24px 8px 8px; }
+  .gallery-cap-text { font-size: 0.82rem; }
+  .gallery-badge { top: 6px; left: 6px; padding: 2px 8px; font-size: 0.62rem; }
+}
