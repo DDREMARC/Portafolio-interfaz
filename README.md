@@ -46,3 +46,12 @@ Abre `testimonios.js` y pon las opiniones dentro de `window.TESTIMONIOS`. Cada u
 - Imágenes de la galería en `galeria-data.js`.
 - URL final de InfinityFree (para enlaces y para probar el envío).
 - Probar el envío de correo real en el servidor (en local no se puede).
+
+## Railway (con base de datos)
+
+1. En Railway: **New → GitHub Repo → `Portafolio-interfaz`**. Railway detecta PHP y usa `railway.json` (`php -S ... router.php`).
+2. En el mismo proyecto: **New → Database → MySQL** (o PostgreSQL).
+3. En el servicio web → **Variables → New Variable → Add Reference** y enlaza `MYSQL_URL` (o `DATABASE_URL` si usas Postgres) del servicio de base de datos.
+4. **Settings → Networking → Generate Domain** para obtener la URL pública.
+5. `contacto.php` crea la tabla `contactos` solo, guarda cada mensaje ahí y limita a 5 por hora por IP. El correo con `mail()` es opcional y no funciona en Railway.
+6. Ver mensajes: pestaña **Data** del servicio de base de datos en Railway.

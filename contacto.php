@@ -53,6 +53,56 @@ function preparar_carpeta()
     }
 }
 
+
+/* ---------- base de datos (Railway: MySQL o Postgres por variables de entorno) ---------- */
+
+/** PDO si hay base configurada por entorno; null si no (entonces se usan archivos + mail()). */
+function conexion_db()
+{
+    static $pdo = false;
+    if ($pdo !== false) {
+        return $pdo;
+    }
+    $pdo = null;
+    $url = getenv('MYSQL_URL') ?: (getenv('DATABASE_URL') ?: '');
+    $p = $url !== '' ? parse_url($url) : false;
+    if ($p && isset($p['scheme'], $p['host'])) {
+        $pg = in_array($p['scheme'], array('postgres', 'postgresql'), true);
+        $host = $p['host']; $port = isset($p['port']) ? (int) $p['port'] : ($pg ? 5432 : 3306);
+        $user = isset($p['user']) ? urldecode($p['user']) : '';
+        $pass = isset($p['pass']) ? urldecode($p['pass']) : '';
+        $db = isset($p['path']) ? ltrim($p['path'], '/') : '';
+    } elseif (getenv('MYSQLHOST')) {
+        $pg = false; $host = getenv('MYSQLHOST'); $port = (int) (getenv('MYSQLPORT') ?: 3306);
+        $user = (string) getenv('MYSQLUSER'); $pass = (string) getenv('MYSQLPASSWORD'); $db = (string) getenv('MYSQLDATABASE');
+    } else {
+        return $pdo;
+    }
+    try {
+        $dsn = ($pg ? 'pgsql' : 'mysql') . ':host=' . $host . ';port=' . $port . ';dbname=' . $db . ($pg ? '' : ';charset=utf8mb4');
+        $pdo = new PDO($dsn, $user, $pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5));
+        $id = $pg ? 'BIGSERIAL PRIMARY KEY' : 'BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY';
+        $pdo->exec('CREATE TABLE IF NOT EXISTS contactos ('
+            . 'id ' . $id . ', creado TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, '
+            . 'ip_hash CHAR(64) NOT NULL, nombre VARCHAR(80) NOT NULL, correo VARCHAR(120) NOT NULL, '
+            . 'mensaje TEXT NOT NULL, enviado_mail SMALLINT NOT NULL DEFAULT 0)');
+    } catch (Throwable $e) {
+        error_log('contacto.php: no se pudo conectar a la base: ' . $e->getMessage());
+        $pdo = null;
+    }
+    return $pdo;
+}
+
+function db_envios_recientes(PDO $pdo, $ipHash)
+{
+    $pg = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+    $sql = $pg ? "SELECT COUNT(*) FROM contactos WHERE ip_hash = ? AND creado > NOW() - INTERVAL '1 hour'"
+               : 'SELECT COUNT(*) FROM contactos WHERE ip_hash = ? AND creado > (NOW() - INTERVAL 1 HOUR)';
+    $st = $pdo->prepare($sql);
+    $st->execute(array($ipHash));
+    return (int) $st->fetchColumn();
+}
+
 /* ---------- límite por IP (archivo mensajes/limite-<hash>.json con marcas de tiempo) ---------- */
 
 function archivo_limite($ip)
@@ -137,7 +187,9 @@ $configurado = filter_var($destino, FILTER_VALIDATE_EMAIL)
     && stripos($datosConfig, 'TU_CORREO') === false     // sigue la plantilla sin cambiar
     && stripos($datosConfig, 'TU-DOMINIO') === false;
 
-if (!$configurado) {
+$pdo = conexion_db();   // Railway: guarda en la base; mail() pasa a ser opcional
+
+if (!$configurado && !$pdo) {
     responder(500, false, 'El formulario todavía no está configurado en el servidor. Inténtalo más tarde.');
 }
 
@@ -145,11 +197,27 @@ if (!$configurado) {
    4. Límite por IP
    ========================================================= */
 
-preparar_carpeta();
 $ip = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
+// Detrás del proxy de Railway la IP real viene en X-Forwarded-For (primer valor).
+if ($pdo && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    $primera = trim(explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+    if (filter_var($primera, FILTER_VALIDATE_IP)) {
+        $ip = $primera;
+    }
+}
+$ipHash = hash('sha256', $ip);
+if (!$pdo) {
+    preparar_carpeta();
+}
 $archivoLimite = archivo_limite($ip);
 
-if (count(envios_recientes($archivoLimite)) >= LIMITE_ENVIOS) {
+$recientes = 0;
+try {
+    $recientes = $pdo ? db_envios_recientes($pdo, $ipHash) : count(envios_recientes($archivoLimite));
+} catch (Throwable $e) {
+    error_log('contacto.php: límite: ' . $e->getMessage());
+}
+if ($recientes >= LIMITE_ENVIOS) {
     responder(429, false, 'Has enviado varios mensajes seguidos. Inténtalo de nuevo dentro de un rato.');
 }
 
@@ -215,7 +283,22 @@ $cuerpo = "Nuevo mensaje desde el formulario de contacto.\n\n"
     . "Fecha: " . $fecha . "\n\n"
     . "Mensaje:\n" . $mensaje . "\n";
 
-$enviado = (bool) @mail($destino, $asunto, chunk_split(base64_encode($cuerpo)), $cabeceras);
+$enviado = false;
+if ($configurado) {
+    $enviado = (bool) @mail($destino, $asunto, chunk_split(base64_encode($cuerpo)), $cabeceras);
+}
+
+if ($pdo) {
+    // Railway: la base es el registro principal. El correo (si hay config.php) es un extra.
+    try {
+        $st = $pdo->prepare('INSERT INTO contactos (ip_hash, nombre, correo, mensaje, enviado_mail) VALUES (?, ?, ?, ?, ?)');
+        $st->execute(array($ipHash, $nombre, $correo, $mensaje, $enviado ? 1 : 0));
+    } catch (Throwable $e) {
+        error_log('contacto.php: insert: ' . $e->getMessage());
+        responder(500, false, 'No se pudo guardar el mensaje en este momento. Inténtalo más tarde.');
+    }
+    responder(200, true, 'Mensaje enviado. Gracias, te respondo pronto.');
+}
 
 // Una línea JSON por mensaje (los saltos de línea del texto quedan escapados).
 $linea = json_encode(array(
@@ -228,7 +311,8 @@ $linea = json_encode(array(
 ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 if ($linea !== false) {
-    @file_put_contents(CARPETA_MENSAJES . '/contacto.log', $linea . "\n", FILE_APPEND | LOCK_EX);
+    @file_put_contents(CARPETA_MENSAJES . '/contacto.log', $linea . "
+", FILE_APPEND | LOCK_EX);
 }
 
 if (!$enviado) {
